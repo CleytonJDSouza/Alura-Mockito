@@ -8,9 +8,11 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Mockito.*;
 
@@ -36,19 +38,16 @@ class FinalizarLeilaoServiceTest {
     void deveriaFinalizarUmLeilao() {
         List<Leilao> leiloes = leiloes();
 
+        Mockito.when(leilaoDao.buscarLeiloesExpirados()).thenReturn(leiloes);
+
         service.finalizarLeiloesExpirados();
+
+        Leilao leilao = leiloes.get(0);
+        Assert.assertTrue(leilao.isFechado());
+        Assert.assertEquals(new BigDecimal("900"), leilao.getLanceVencedor().getValor());
+
+        Mockito.verify(leilaoDao).salvar(leilao);
         
-        //Minha Lógica
-        /*List<Leilao> leiloesExpirados = leiloes();
-        when(leilaoDao.buscarLeiloesExpirados()).thenReturn(leiloesExpirados);
-
-        service.finalizarLeiloesExpirados();
-
-        for (Leilao leilao : leiloesExpirados) {
-            verify(leilao).setLanceVencedor(any());
-            verify(leilao).fechar();
-            verify(leilaoDao).salvar(leilao);
-        }*/
     }
 
     private List<Leilao> leiloes() {
